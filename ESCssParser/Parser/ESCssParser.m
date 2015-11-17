@@ -11,40 +11,6 @@
 
 static ESCssParser *__currentParser = nil;
 
-typedef NS_ENUM(NSUInteger, RuleType) {
-    RuleTypeStyle,
-    RuleTypeCharset,
-    RuleTypeKeyframes,
-    RuleTypeKeyframe
-};
-
-typedef NS_ENUM(NSUInteger, Flags) {
-    InsideStyleSheet,
-    InsideKeyframes,
-    InsideRuleSet,
-    InsideProperty,
-    InsideValue
-};
-
-@interface ESCssParser () {
-    NSMutableDictionary*    _styleSheet;
-    NSMutableDictionary *   _activeKeyframes;
-    NSMutableDictionary *   _activeRuleSet;
-    NSMutableString *       _activeSelector;
-    NSMutableString *       _activeKeyframesName;
-    NSString *              _activePropertyName;
-    
-    
-    struct {
-        RuleType type;
-        Flags flag;
-        int lastToken;
-    } _state;
-}
-
-- (void)cssScan:(const char *)text token:(int)token;
-
-@end
 
 void css_scan(const char *text, int token) {
     [__currentParser cssScan:text token:token];
@@ -171,6 +137,7 @@ void css_scan(const char *text, int token) {
                         _state.flag = InsideValue;
                         NSMutableString *value = [[NSMutableString alloc] init];
                         _activeRuleSet[_activePropertyName] = value;
+                        [value release];
                     }
                     break;
                 case '@': {
